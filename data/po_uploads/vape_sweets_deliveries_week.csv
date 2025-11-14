@@ -1,0 +1,214 @@
+date,delivery_id,brand,product_type,flavour,boxes_delivered,driver,delivery_time
+2025-09-15,D2000,Killa,Vape Pod,Cola Ice,713,Chris,2025-09-15 13:02:00
+2025-09-15,D2000,Killa,Vape Pod,Tropical Mix,750,Jordan,2025-09-15 10:01:00
+2025-09-15,D2000,Killa,Vape Pod,Apple,701,Jordan,2025-09-15 15:27:00
+2025-09-15,D2000,Killa,Vape Pod,Mango Ice,678,Chris,2025-09-15 19:46:00
+2025-09-15,D2000,Killa,Vape Pod,Strawberry Kiwi,703,Taylor,2025-09-15 14:02:00
+2025-09-15,D2001,High Pablo,Vape Pod,Mojito,628,Chris,2025-09-15 14:59:00
+2025-09-15,D2001,High Pablo,Vape Pod,Berry Blast,669,Jordan,2025-09-15 10:01:00
+2025-09-15,D2001,High Pablo,Vape Pod,Orange Soda,747,Jordan,2025-09-15 17:46:00
+2025-09-15,D2001,High Pablo,Vape Pod,Mint Ice,699,Alex,2025-09-15 08:13:00
+2025-09-15,D2001,High Pablo,Vape Pod,Cherry Cola,647,Jordan,2025-09-15 09:49:00
+2025-09-15,D2002,Hayati,Pod Kit,Grape Ice,736,Jordan,2025-09-15 13:13:00
+2025-09-15,D2002,Hayati,Pod Kit,Blue Razz,708,Taylor,2025-09-15 14:39:00
+2025-09-15,D2002,Hayati,Pod Kit,Lychee,626,Priya,2025-09-15 10:23:00
+2025-09-15,D2002,Hayati,Pod Kit,Lemon Mint,664,Jordan,2025-09-15 14:59:00
+2025-09-15,D2002,Hayati,Pod Kit,Kiwi Passionfruit,643,Alex,2025-09-15 18:00:00
+2025-09-15,D2002,Hayati,Pod Kit,Banana Ice,706,Alex,2025-09-15 12:08:00
+2025-09-15,D2003,Killa,Vape Pod,Tropical Mix,658,Jordan,2025-09-15 12:08:00
+2025-09-15,D2003,Killa,Vape Pod,Cola Ice,684,Chris,2025-09-15 07:32:00
+2025-09-15,D2003,Killa,Vape Pod,Strawberry Kiwi,758,Sam,2025-09-15 13:21:00
+2025-09-15,D2003,Killa,Vape Pod,Mango Ice,655,Sam,2025-09-15 08:00:00
+2025-09-15,D2003,Killa,Vape Pod,Apple,718,Priya,2025-09-15 06:04:00
+2025-09-15,D2003,Killa,Vape Pod,Blueberry Mint,667,Sam,2025-09-15 12:13:00
+2025-09-15,D2004,Pixl 8000,Vape Pod,Strawberry,704,Jordan,2025-09-15 09:31:00
+2025-09-15,D2004,Pixl 8000,Vape Pod,Cola,685,Taylor,2025-09-15 19:36:00
+2025-09-15,D2004,Pixl 8000,Vape Pod,Blueberry Ice,629,Sam,2025-09-15 18:31:00
+2025-09-15,D2004,Pixl 8000,Vape Pod,Watermelon,709,Jordan,2025-09-15 08:21:00
+2025-09-15,D2004,Pixl 8000,Vape Pod,Peach Ice,745,Jordan,2025-09-15 17:43:00
+2025-09-16,D2005,High Pablo,Vape Pod,Pineapple,716,Alex,2025-09-16 06:00:00
+2025-09-16,D2005,High Pablo,Vape Pod,Mojito,632,Sam,2025-09-16 11:07:00
+2025-09-16,D2005,High Pablo,Vape Pod,Mint Ice,649,Alex,2025-09-16 14:36:00
+2025-09-16,D2005,High Pablo,Vape Pod,Cherry Cola,682,Alex,2025-09-16 16:53:00
+2025-09-16,D2005,High Pablo,Vape Pod,Berry Blast,659,Chris,2025-09-16 09:48:00
+2025-09-16,D2005,High Pablo,Vape Pod,Orange Soda,699,Alex,2025-09-16 06:36:00
+2025-09-16,D2006,Pixl 8000,Vape Pod,Cola,616,Alex,2025-09-16 10:31:00
+2025-09-16,D2006,Pixl 8000,Vape Pod,Peach Ice,771,Priya,2025-09-16 10:43:00
+2025-09-16,D2006,Pixl 8000,Vape Pod,Watermelon,753,Jordan,2025-09-16 11:31:00
+2025-09-16,D2006,Pixl 8000,Vape Pod,Strawberry,689,Taylor,2025-09-16 06:37:00
+2025-09-16,D2006,Pixl 8000,Vape Pod,Mango,665,Chris,2025-09-16 09:33:00
+2025-09-16,D2007,High Pablo,Vape Pod,Pineapple,739,Jordan,2025-09-16 17:58:00
+2025-09-16,D2007,High Pablo,Vape Pod,Orange Soda,721,Sam,2025-09-16 08:25:00
+2025-09-16,D2007,High Pablo,Vape Pod,Mint Ice,673,Alex,2025-09-16 12:51:00
+2025-09-16,D2007,High Pablo,Vape Pod,Berry Blast,754,Priya,2025-09-16 06:39:00
+2025-09-16,D2007,High Pablo,Vape Pod,Mojito,724,Priya,2025-09-16 14:24:00
+2025-09-16,D2008,Hayati,Pod Kit,Grape Ice,746,Priya,2025-09-16 17:48:00
+2025-09-16,D2008,Hayati,Pod Kit,Lychee,750,Alex,2025-09-16 12:08:00
+2025-09-16,D2008,Hayati,Pod Kit,Blue Razz,707,Sam,2025-09-16 08:18:00
+2025-09-16,D2008,Hayati,Pod Kit,Banana Ice,685,Jordan,2025-09-16 06:23:00
+2025-09-16,D2008,Hayati,Pod Kit,Kiwi Passionfruit,753,Jordan,2025-09-16 16:48:00
+2025-09-16,D2009,Killa,Vape Pod,Tropical Mix,650,Sam,2025-09-16 07:53:00
+2025-09-16,D2009,Killa,Vape Pod,Cola Ice,645,Jordan,2025-09-16 18:40:00
+2025-09-16,D2009,Killa,Vape Pod,Strawberry Kiwi,651,Jordan,2025-09-16 10:47:00
+2025-09-16,D2009,Killa,Vape Pod,Apple,739,Sam,2025-09-16 13:07:00
+2025-09-16,D2009,Killa,Vape Pod,Mango Ice,741,Sam,2025-09-16 17:58:00
+2025-09-16,D2009,Killa,Vape Pod,Blueberry Mint,794,Chris,2025-09-16 11:54:00
+2025-09-16,D2010,Sweets,Sweet Box,Bubblegum,800,Jordan,2025-09-16 06:04:00
+2025-09-16,D2010,Sweets,Sweet Box,Cola Bottles,704,Sam,2025-09-16 18:47:00
+2025-09-16,D2010,Sweets,Sweet Box,Strawberry Laces,773,Jordan,2025-09-16 06:43:00
+2025-09-16,D2010,Sweets,Sweet Box,Sour Apple,719,Chris,2025-09-16 19:28:00
+2025-09-16,D2010,Sweets,Sweet Box,Fizzy Cherry,688,Taylor,2025-09-16 14:36:00
+2025-09-17,D2011,Sweets,Sweet Box,Strawberry Laces,735,Alex,2025-09-17 10:31:00
+2025-09-17,D2011,Sweets,Sweet Box,Sour Apple,653,Chris,2025-09-17 14:41:00
+2025-09-17,D2011,Sweets,Sweet Box,Mixed Fruit,674,Chris,2025-09-17 15:02:00
+2025-09-17,D2011,Sweets,Sweet Box,Cola Bottles,711,Priya,2025-09-17 11:22:00
+2025-09-17,D2011,Sweets,Sweet Box,Bubblegum,659,Priya,2025-09-17 16:41:00
+2025-09-17,D2012,Hayati,Pod Kit,Lychee,609,Priya,2025-09-17 15:34:00
+2025-09-17,D2012,Hayati,Pod Kit,Lemon Mint,723,Taylor,2025-09-17 14:23:00
+2025-09-17,D2012,Hayati,Pod Kit,Kiwi Passionfruit,640,Chris,2025-09-17 13:45:00
+2025-09-17,D2012,Hayati,Pod Kit,Grape Ice,724,Jordan,2025-09-17 17:50:00
+2025-09-17,D2012,Hayati,Pod Kit,Banana Ice,621,Alex,2025-09-17 11:50:00
+2025-09-17,D2013,Hayati,Pod Kit,Blue Razz,800,Jordan,2025-09-17 11:48:00
+2025-09-17,D2013,Hayati,Pod Kit,Grape Ice,600,Jordan,2025-09-17 13:52:00
+2025-09-17,D2013,Hayati,Pod Kit,Lemon Mint,721,Taylor,2025-09-17 17:43:00
+2025-09-17,D2013,Hayati,Pod Kit,Kiwi Passionfruit,760,Sam,2025-09-17 09:29:00
+2025-09-17,D2013,Hayati,Pod Kit,Lychee,692,Jordan,2025-09-17 12:39:00
+2025-09-17,D2014,Sweets,Sweet Box,Mixed Fruit,634,Priya,2025-09-17 15:54:00
+2025-09-17,D2014,Sweets,Sweet Box,Cola Bottles,600,Taylor,2025-09-17 10:25:00
+2025-09-17,D2014,Sweets,Sweet Box,Fizzy Cherry,693,Alex,2025-09-17 17:52:00
+2025-09-17,D2014,Sweets,Sweet Box,Sour Apple,660,Alex,2025-09-17 15:57:00
+2025-09-17,D2014,Sweets,Sweet Box,Strawberry Laces,622,Alex,2025-09-17 11:47:00
+2025-09-17,D2014,Sweets,Sweet Box,Bubblegum,682,Taylor,2025-09-17 13:44:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Watermelon,704,Chris,2025-09-17 08:36:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Cola,670,Chris,2025-09-17 14:28:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Blueberry Ice,734,Chris,2025-09-17 09:32:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Mango,729,Priya,2025-09-17 19:36:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Peach Ice,777,Priya,2025-09-17 07:51:00
+2025-09-17,D2015,Pixl 8000,Vape Pod,Strawberry,766,Priya,2025-09-17 15:18:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Blueberry Ice,703,Jordan,2025-09-18 16:19:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Mango,680,Jordan,2025-09-18 07:34:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Cola,711,Jordan,2025-09-18 16:36:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Watermelon,686,Alex,2025-09-18 08:00:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Peach Ice,642,Jordan,2025-09-18 18:12:00
+2025-09-18,D2016,Pixl 8000,Vape Pod,Strawberry,729,Taylor,2025-09-18 19:01:00
+2025-09-18,D2017,High Pablo,Vape Pod,Mojito,643,Jordan,2025-09-18 08:40:00
+2025-09-18,D2017,High Pablo,Vape Pod,Berry Blast,764,Priya,2025-09-18 15:52:00
+2025-09-18,D2017,High Pablo,Vape Pod,Pineapple,744,Taylor,2025-09-18 09:24:00
+2025-09-18,D2017,High Pablo,Vape Pod,Orange Soda,715,Jordan,2025-09-18 18:56:00
+2025-09-18,D2017,High Pablo,Vape Pod,Cherry Cola,727,Sam,2025-09-18 08:48:00
+2025-09-18,D2017,High Pablo,Vape Pod,Mint Ice,664,Alex,2025-09-18 09:17:00
+2025-09-18,D2018,Sweets,Sweet Box,Strawberry Laces,765,Sam,2025-09-18 11:12:00
+2025-09-18,D2018,Sweets,Sweet Box,Bubblegum,701,Jordan,2025-09-18 08:48:00
+2025-09-18,D2018,Sweets,Sweet Box,Mixed Fruit,686,Jordan,2025-09-18 19:30:00
+2025-09-18,D2018,Sweets,Sweet Box,Fizzy Cherry,669,Taylor,2025-09-18 08:57:00
+2025-09-18,D2018,Sweets,Sweet Box,Sour Apple,710,Taylor,2025-09-18 09:58:00
+2025-09-18,D2018,Sweets,Sweet Box,Cola Bottles,659,Alex,2025-09-18 09:52:00
+2025-09-18,D2019,Sweets,Sweet Box,Bubblegum,790,Priya,2025-09-18 17:08:00
+2025-09-18,D2019,Sweets,Sweet Box,Cola Bottles,720,Alex,2025-09-18 15:43:00
+2025-09-18,D2019,Sweets,Sweet Box,Sour Apple,678,Priya,2025-09-18 07:26:00
+2025-09-18,D2019,Sweets,Sweet Box,Fizzy Cherry,710,Taylor,2025-09-18 07:04:00
+2025-09-18,D2019,Sweets,Sweet Box,Mixed Fruit,627,Alex,2025-09-18 09:16:00
+2025-09-18,D2020,Sweets,Sweet Box,Strawberry Laces,629,Sam,2025-09-18 17:53:00
+2025-09-18,D2020,Sweets,Sweet Box,Cola Bottles,660,Taylor,2025-09-18 19:02:00
+2025-09-18,D2020,Sweets,Sweet Box,Sour Apple,641,Jordan,2025-09-18 18:49:00
+2025-09-18,D2020,Sweets,Sweet Box,Fizzy Cherry,779,Alex,2025-09-18 13:40:00
+2025-09-18,D2020,Sweets,Sweet Box,Mixed Fruit,723,Jordan,2025-09-18 08:12:00
+2025-09-18,D2020,Sweets,Sweet Box,Bubblegum,694,Alex,2025-09-18 06:24:00
+2025-09-18,D2021,Sweets,Sweet Box,Mixed Fruit,720,Chris,2025-09-18 10:15:00
+2025-09-18,D2021,Sweets,Sweet Box,Fizzy Cherry,742,Alex,2025-09-18 14:17:00
+2025-09-18,D2021,Sweets,Sweet Box,Sour Apple,646,Alex,2025-09-18 06:13:00
+2025-09-18,D2021,Sweets,Sweet Box,Cola Bottles,760,Sam,2025-09-18 12:56:00
+2025-09-18,D2021,Sweets,Sweet Box,Bubblegum,790,Chris,2025-09-18 17:09:00
+2025-09-18,D2021,Sweets,Sweet Box,Strawberry Laces,800,Jordan,2025-09-18 13:57:00
+2025-09-19,D2022,Hayati,Pod Kit,Lychee,659,Chris,2025-09-19 09:26:00
+2025-09-19,D2022,Hayati,Pod Kit,Grape Ice,786,Chris,2025-09-19 18:12:00
+2025-09-19,D2022,Hayati,Pod Kit,Blue Razz,625,Priya,2025-09-19 08:05:00
+2025-09-19,D2022,Hayati,Pod Kit,Banana Ice,784,Priya,2025-09-19 14:01:00
+2025-09-19,D2022,Hayati,Pod Kit,Lemon Mint,613,Priya,2025-09-19 13:29:00
+2025-09-19,D2022,Hayati,Pod Kit,Kiwi Passionfruit,638,Chris,2025-09-19 13:32:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Strawberry,709,Sam,2025-09-19 14:21:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Watermelon,713,Sam,2025-09-19 07:40:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Mango,713,Chris,2025-09-19 06:20:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Peach Ice,717,Sam,2025-09-19 10:37:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Cola,795,Taylor,2025-09-19 10:22:00
+2025-09-19,D2023,Pixl 8000,Vape Pod,Blueberry Ice,746,Taylor,2025-09-19 08:16:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Strawberry,740,Alex,2025-09-19 19:00:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Mango,600,Priya,2025-09-19 08:58:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Watermelon,686,Chris,2025-09-19 17:00:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Peach Ice,720,Taylor,2025-09-19 12:14:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Cola,767,Priya,2025-09-19 10:13:00
+2025-09-19,D2024,Pixl 8000,Vape Pod,Blueberry Ice,710,Priya,2025-09-19 07:33:00
+2025-09-19,D2025,High Pablo,Vape Pod,Mint Ice,702,Jordan,2025-09-19 13:14:00
+2025-09-19,D2025,High Pablo,Vape Pod,Pineapple,711,Taylor,2025-09-19 06:04:00
+2025-09-19,D2025,High Pablo,Vape Pod,Mojito,605,Alex,2025-09-19 09:09:00
+2025-09-19,D2025,High Pablo,Vape Pod,Cherry Cola,614,Priya,2025-09-19 13:04:00
+2025-09-19,D2025,High Pablo,Vape Pod,Berry Blast,697,Priya,2025-09-19 11:52:00
+2025-09-19,D2026,Sweets,Sweet Box,Strawberry Laces,600,Jordan,2025-09-19 16:53:00
+2025-09-19,D2026,Sweets,Sweet Box,Cola Bottles,800,Alex,2025-09-19 13:03:00
+2025-09-19,D2026,Sweets,Sweet Box,Sour Apple,696,Priya,2025-09-19 18:31:00
+2025-09-19,D2026,Sweets,Sweet Box,Bubblegum,747,Sam,2025-09-19 18:57:00
+2025-09-19,D2026,Sweets,Sweet Box,Mixed Fruit,659,Alex,2025-09-19 10:05:00
+2025-09-19,D2026,Sweets,Sweet Box,Fizzy Cherry,672,Jordan,2025-09-19 10:40:00
+2025-09-19,D2027,Hayati,Pod Kit,Grape Ice,668,Chris,2025-09-19 14:21:00
+2025-09-19,D2027,Hayati,Pod Kit,Lychee,686,Taylor,2025-09-19 16:47:00
+2025-09-19,D2027,Hayati,Pod Kit,Lemon Mint,709,Chris,2025-09-19 09:14:00
+2025-09-19,D2027,Hayati,Pod Kit,Banana Ice,661,Jordan,2025-09-19 19:25:00
+2025-09-19,D2027,Hayati,Pod Kit,Blue Razz,668,Chris,2025-09-19 18:25:00
+2025-09-19,D2027,Hayati,Pod Kit,Kiwi Passionfruit,600,Sam,2025-09-19 16:55:00
+2025-09-20,D2028,High Pablo,Vape Pod,Berry Blast,776,Taylor,2025-09-20 14:54:00
+2025-09-20,D2028,High Pablo,Vape Pod,Orange Soda,600,Alex,2025-09-20 17:09:00
+2025-09-20,D2028,High Pablo,Vape Pod,Cherry Cola,621,Alex,2025-09-20 18:19:00
+2025-09-20,D2028,High Pablo,Vape Pod,Pineapple,710,Sam,2025-09-20 09:09:00
+2025-09-20,D2028,High Pablo,Vape Pod,Mint Ice,685,Chris,2025-09-20 09:46:00
+2025-09-20,D2029,Hayati,Pod Kit,Lychee,800,Jordan,2025-09-20 10:05:00
+2025-09-20,D2029,Hayati,Pod Kit,Banana Ice,746,Taylor,2025-09-20 13:58:00
+2025-09-20,D2029,Hayati,Pod Kit,Kiwi Passionfruit,795,Alex,2025-09-20 11:36:00
+2025-09-20,D2029,Hayati,Pod Kit,Grape Ice,681,Jordan,2025-09-20 11:05:00
+2025-09-20,D2029,Hayati,Pod Kit,Lemon Mint,688,Chris,2025-09-20 19:10:00
+2025-09-20,D2030,Pixl 8000,Vape Pod,Watermelon,739,Alex,2025-09-20 11:53:00
+2025-09-20,D2030,Pixl 8000,Vape Pod,Mango,707,Chris,2025-09-20 19:55:00
+2025-09-20,D2030,Pixl 8000,Vape Pod,Blueberry Ice,726,Priya,2025-09-20 16:07:00
+2025-09-20,D2030,Pixl 8000,Vape Pod,Strawberry,710,Jordan,2025-09-20 08:44:00
+2025-09-20,D2030,Pixl 8000,Vape Pod,Peach Ice,654,Jordan,2025-09-20 09:48:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Watermelon,731,Sam,2025-09-20 09:12:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Blueberry Ice,613,Taylor,2025-09-20 13:09:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Cola,762,Jordan,2025-09-20 12:09:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Mango,731,Taylor,2025-09-20 09:00:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Strawberry,649,Alex,2025-09-20 14:16:00
+2025-09-20,D2031,Pixl 8000,Vape Pod,Peach Ice,663,Chris,2025-09-20 12:34:00
+2025-09-20,D2032,Pixl 8000,Vape Pod,Blueberry Ice,800,Sam,2025-09-20 10:55:00
+2025-09-20,D2032,Pixl 8000,Vape Pod,Cola,704,Taylor,2025-09-20 11:59:00
+2025-09-20,D2032,Pixl 8000,Vape Pod,Mango,692,Alex,2025-09-20 13:10:00
+2025-09-20,D2032,Pixl 8000,Vape Pod,Strawberry,738,Taylor,2025-09-20 08:20:00
+2025-09-20,D2032,Pixl 8000,Vape Pod,Watermelon,731,Sam,2025-09-20 10:18:00
+2025-09-21,D2033,Hayati,Pod Kit,Grape Ice,674,Sam,2025-09-21 13:13:00
+2025-09-21,D2033,Hayati,Pod Kit,Banana Ice,795,Alex,2025-09-21 18:37:00
+2025-09-21,D2033,Hayati,Pod Kit,Kiwi Passionfruit,700,Alex,2025-09-21 14:16:00
+2025-09-21,D2033,Hayati,Pod Kit,Lychee,783,Chris,2025-09-21 12:01:00
+2025-09-21,D2033,Hayati,Pod Kit,Blue Razz,600,Sam,2025-09-21 08:06:00
+2025-09-21,D2033,Hayati,Pod Kit,Lemon Mint,771,Jordan,2025-09-21 13:41:00
+2025-09-21,D2034,Sweets,Sweet Box,Sour Apple,741,Alex,2025-09-21 16:54:00
+2025-09-21,D2034,Sweets,Sweet Box,Strawberry Laces,750,Chris,2025-09-21 19:03:00
+2025-09-21,D2034,Sweets,Sweet Box,Cola Bottles,697,Chris,2025-09-21 15:32:00
+2025-09-21,D2034,Sweets,Sweet Box,Mixed Fruit,792,Jordan,2025-09-21 11:12:00
+2025-09-21,D2034,Sweets,Sweet Box,Fizzy Cherry,800,Taylor,2025-09-21 18:07:00
+2025-09-21,D2035,Sweets,Sweet Box,Fizzy Cherry,653,Jordan,2025-09-21 08:50:00
+2025-09-21,D2035,Sweets,Sweet Box,Sour Apple,618,Sam,2025-09-21 10:19:00
+2025-09-21,D2035,Sweets,Sweet Box,Strawberry Laces,714,Chris,2025-09-21 19:09:00
+2025-09-21,D2035,Sweets,Sweet Box,Cola Bottles,679,Sam,2025-09-21 15:45:00
+2025-09-21,D2035,Sweets,Sweet Box,Mixed Fruit,627,Taylor,2025-09-21 17:25:00
+2025-09-21,D2036,Hayati,Pod Kit,Lychee,669,Sam,2025-09-21 14:53:00
+2025-09-21,D2036,Hayati,Pod Kit,Kiwi Passionfruit,765,Alex,2025-09-21 18:13:00
+2025-09-21,D2036,Hayati,Pod Kit,Banana Ice,695,Taylor,2025-09-21 19:36:00
+2025-09-21,D2036,Hayati,Pod Kit,Grape Ice,739,Jordan,2025-09-21 15:45:00
+2025-09-21,D2036,Hayati,Pod Kit,Lemon Mint,702,Taylor,2025-09-21 13:14:00
+2025-09-21,D2037,Pixl 8000,Vape Pod,Strawberry,754,Sam,2025-09-21 15:40:00
+2025-09-21,D2037,Pixl 8000,Vape Pod,Cola,742,Priya,2025-09-21 16:37:00
+2025-09-21,D2037,Pixl 8000,Vape Pod,Peach Ice,600,Sam,2025-09-21 12:17:00
+2025-09-21,D2037,Pixl 8000,Vape Pod,Watermelon,683,Jordan,2025-09-21 16:58:00
+2025-09-21,D2037,Pixl 8000,Vape Pod,Mango,783,Chris,2025-09-21 16:50:00
+2025-09-21,D2038,Pixl 8000,Vape Pod,Mango,664,Priya,2025-09-21 15:27:00
+2025-09-21,D2038,Pixl 8000,Vape Pod,Cola,745,Alex,2025-09-21 10:48:00
+2025-09-21,D2038,Pixl 8000,Vape Pod,Blueberry Ice,660,Alex,2025-09-21 18:39:00
+2025-09-21,D2038,Pixl 8000,Vape Pod,Peach Ice,691,Taylor,2025-09-21 12:00:00
+2025-09-21,D2038,Pixl 8000,Vape Pod,Strawberry,631,Chris,2025-09-21 13:18:00
