@@ -5,7 +5,6 @@
 
 
 # pdf_converter.py
-import pdfplumber
 import pandas as pd
 import os
 import streamlit as st
@@ -39,6 +38,21 @@ def ensure_unique_columns(columns):
     return unique
 
 def read_pdf_with_plumber(pdf_path):
+    """
+    Read tables from a PDF using pdfplumber.
+    pdfplumber is imported lazily so the module can be imported even if the package
+    isn't installed (useful for deploy-time diagnostics).
+    """
+    # Lazy import
+    try:
+        import pdfplumber
+    except ModuleNotFoundError:
+        # Raise a clear runtime error so callers can handle it; show instructions in Streamlit UI
+        raise RuntimeError(
+            "Missing dependency 'pdfplumber'. Install it (pip install pdfplumber) "
+            "or add it to requirements.txt and redeploy."
+        )
+
     all_tables = []
     try:
         with pdfplumber.open(pdf_path) as pdf:
@@ -65,16 +79,15 @@ def read_pdf_with_plumber(pdf_path):
                     df["Page"] = i
                     all_tables.append(df)
     except Exception as e:
-        st.error(f"PDF read error: {e}")
-        return pd.DataFrame()
+        # bubble up a clear error for the caller (UI can catch and show it)
+        raise RuntimeError(f"PDF read error for '{pdf_path}': {e}")
 
     if not all_tables:
         return pd.DataFrame()
     try:
         df = pd.concat(all_tables, ignore_index=True)
     except Exception as e:
-        st.error(f"PDF merge error: {e}")
-        return pd.DataFrame()
+        raise RuntimeError(f"PDF merge error: {e}")
     return df
 
 def standardize_columns(df):
@@ -100,10 +113,19 @@ def standardize_columns(df):
 def convert_pdf_to_csv(pdf_path):
     """
     Reads PDF, extracts tables, standardizes, saves CSV in same dir with suffix _extracted.csv
+    Returns the CSV path or None if extraction produced no data.
     """
-    df = read_pdf_with_plumber(pdf_path)
-    if df.empty:
+    try:
+        df = read_pdf_with_plumber(pdf_path)
+    except RuntimeError as e:
+        # Let the caller/UI see the message; in Streamlit pages it's fine to show st.error
+        st.error(str(e))
         return None
+
+    if df.empty:
+        st.info("No tables found in the provided PDF.")
+        return None
+
     df = standardize_columns(df)
     df.columns = ensure_unique_columns(df.columns)
     # keep relevant cols if present
