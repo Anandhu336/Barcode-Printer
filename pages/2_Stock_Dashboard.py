@@ -1,226 +1,253 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[ ]:
-
-
-# stock_dashboard.py
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import os
-import datetime as dt
-from thefuzz import fuzz
-
-# --- Page Config ---
-st.set_page_config(page_title="Warehouse Stock Dashboard", layout="wide")
-
-st.title("📊 Warehouse Live Stock Dashboard")
-st.caption("Visualize and analyze real-time stock levels across all aisles and locations.")
-
-# --- Load or Upload Data ---
-DATA_PATH = "data/warehouse_stock.csv"
-os.makedirs("data", exist_ok=True)
-
-st.sidebar.header("📂 Data Source")
-
-if not os.path.exists(DATA_PATH):
-    st.warning("No stock database found. Please upload one to start.")
-    stock_file = st.sidebar.file_uploader("Upload stock data (CSV)", type=["csv"])
-    if stock_file:
-        df = pd.read_csv(stock_file)
-        df.to_csv(DATA_PATH, index=False)
-        st.success("✅ Stock data uploaded and saved.")
-    else:
-        st.stop()
-else:
-    df = pd.read_csv(DATA_PATH)
-
-# --- Data Cleaning ---
-df.columns = [c.strip().title().replace(" ", "_") for c in df.columns]
-if "Outstanding" not in df.columns:
-    st.error("Missing 'Outstanding' column in your data.")
-    st.stop()
-
-df["Outstanding"] = pd.to_numeric(df["Outstanding"], errors="coerce").fillna(0)
-df = df.dropna(subset=["Product", "Location"]).reset_index(drop=True)
-
-# --- Sidebar Filters ---
-st.sidebar.header("🔍 Filters")
-
-aisles = sorted(df["Aisle"].dropna().unique()) if "Aisle" in df.columns else []
-selected_aisle = st.sidebar.selectbox("Select Aisle", ["All"] + aisles)
-
-status_list = ["Received", "In Transit", "Out of Stock"]
-if "Status" not in df.columns:
-    df["Status"] = "Received"
-
-selected_status = st.sidebar.multiselect("Filter by Stock Status", status_list, default=status_list)
-search_query = st.sidebar.text_input("Search Product / SKU / Location")
-
-# --- Filter Logic ---
-filtered_df = df.copy()
-if selected_aisle != "All":
-    filtered_df = filtered_df[filtered_df["Aisle"] == selected_aisle]
-if selected_status:
-    filtered_df = filtered_df[filtered_df["Status"].isin(selected_status)]
-
-# --- Smart Fuzzy Search ---
-def fuzzy_match(row_text, query):
-    """Return True if query roughly matches text (case-insensitive, typo-tolerant, any word order)."""
-    if not isinstance(row_text, str) or not isinstance(query, str):
-        return False
-    row_text = row_text.lower()
-    query = query.lower()
-
-    # Word-based loose matching
-    query_words = query.split()
-    if all(word in row_text for word in query_words):
-        return True
-
-    # Fuzzy ratio for typos or partial matches
-    return fuzz.token_set_ratio(row_text, query) >= 70
-
-
-if search_query.strip():
-    searchable_cols = ["Product", "Location"]
-    if "Sku" in filtered_df.columns:
-        searchable_cols.append("Sku")
-
-    mask = filtered_df.apply(
-        lambda row: any(fuzzy_match(str(row[col]), search_query) for col in searchable_cols),
-        axis=1
-    )
-
-    filtered_df = filtered_df[mask]
-
-if filtered_df.empty:
-    st.info("No matching records found for the selected filters.")
-    st.stop()
-
-# --- Low Stock Alerts ---
-st.sidebar.header("⚠️ Stock Alert Settings")
-low_stock_threshold = st.sidebar.number_input("Low Stock Threshold", min_value=1, value=100, step=10)
-filtered_df["Alert"] = filtered_df["Outstanding"].apply(
-    lambda x: "🔴 LOW" if x < low_stock_threshold else
-              "🟡 Medium" if x < low_stock_threshold * 1.5 else
-              "🟢 OK"
-)
-
-# --- Metrics ---
-st.markdown("### 📈 Stock Summary Overview")
-
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Stock", int(filtered_df["Outstanding"].sum()))
-col2.metric("Unique Products", filtered_df["Product"].nunique())
-col3.metric("Active Locations", filtered_df["Location"].nunique())
-col4.metric("Low Stock Items", (filtered_df['Alert'] == "🔴 LOW").sum())
-
-# --- Visualization 1: Stock per Location ---
-st.markdown("### 🏭 Stock by Location")
-
-fig = px.bar(
-    filtered_df,
-    x="Location",
-    y="Outstanding",
-    color="Alert",
-    text="Outstanding",
-    hover_data={
-        "Product": True,
-        "Status": True,
-        "Alert": True,
-        "Outstanding": True
-    },
-    color_discrete_map={
-        "🔴 LOW": "red",
-        "🟡 Medium": "orange",
-        "🟢 OK": "green"
-    },
-    title=f"Stock Distribution {'(All Aisles)' if selected_aisle == 'All' else f'in Aisle {selected_aisle}'}"
-)
-
-fig.update_traces(
-    textposition="outside",
-    hovertemplate=(
-        "<b>📍 Location:</b> %{x}<br>"
-        "<b>🧾 Product:</b> %{customdata[0]}<br>"
-        "<b>🚚 Status:</b> %{customdata[1]}<br>"
-        "<b>📦 Stock:</b> %{y} units<br>"
-        "<b>⚠️ Alert:</b> %{customdata[2]}<extra></extra>"
-    )
-)
-
-# --- 🖤 Hover Fix for Readability ---
-fig.update_layout(
-    hoverlabel=dict(
-        bgcolor="rgba(50, 50, 50, 0.9)",   # dark hover background
-        font_color="white",
-        font_size=13,
-        font_family="Arial"
-    ),
-    height=600,
-    xaxis_title="Location",
-    yaxis_title="Outstanding Units",
-    template="plotly_white",
-    title_x=0.3
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-# --- Visualization 2: Top 10 Products ---
-# --- Visualization 2: Top 10 Products ---
-st.markdown("##overstock product by  Quantity")
-
-top10 = filtered_df.nlargest(10, "Outstanding")
-
-fig_top = px.bar(
-    top10,
-    x="Product",
-    y="Outstanding",
-    color="Outstanding",
-    text="Outstanding",
-    color_continuous_scale="Blues",
-    title="Top 10 Products by Quantity"
-)
-
-fig_top.update_traces(textposition="outside")
-
-# ✅ Keep product names straight and readable
-fig_top.update_layout(
-    xaxis=dict(
-        tickangle=0,  # 0 = straight labels
-        tickfont=dict(size=12),
-        automargin=True
-    ),
-    yaxis_title="Outstanding Units",
-    xaxis_title="Product",
-    hoverlabel=dict(
-        bgcolor="rgba(50, 50, 50, 0.9)",
-        font_color="white",
-        font_size=13,
-        font_family="Arial"
-    ),
-    height=500,
-    template="plotly_white"
-)
-
-st.plotly_chart(fig_top, use_container_width=True)
-
-# --- Visualization 3: Stock Trend (if Date column exists) ---
-if "Date" in filtered_df.columns:
-    st.markdown("### ⏳ Stock Trend Over Time")
-    trend_df = filtered_df.groupby("Date")["Outstanding"].sum().reset_index()
-    fig_trend = px.line(trend_df, x="Date", y="Outstanding", title="Stock Trend Over Time", markers=True)
-    st.plotly_chart(fig_trend, use_container_width=True)
-
-# --- Detailed Data Table ---
-with st.expander("📋 View Detailed Stock Data"):
-    st.dataframe(filtered_df, use_container_width=True)
-
-# --- Export Button ---
-csv_export = filtered_df.to_csv(index=False).encode("utf-8")
-st.download_button("💾 Download Filtered Data (CSV)", csv_export, "filtered_stock.csv", "text/csv")
-
-st.markdown("---")
-st.caption("Warehouse Dashboard v2.1 | Smart fuzzy search, alerts, and live analytics.")
-
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "8ad57f10-d9bd-49d6-9de7-c47dcdca3c04",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# stock_dashboard.py\n",
+    "import streamlit as st\n",
+    "import pandas as pd\n",
+    "import plotly.express as px\n",
+    "import os\n",
+    "import datetime as dt\n",
+    "from thefuzz import fuzz\n",
+    "\n",
+    "# --- Page Config ---\n",
+    "st.set_page_config(page_title=\"Warehouse Stock Dashboard\", layout=\"wide\")\n",
+    "\n",
+    "st.title(\"📊 Warehouse Live Stock Dashboard\")\n",
+    "st.caption(\"Visualize and analyze real-time stock levels across all aisles and locations.\")\n",
+    "\n",
+    "# --- Load or Upload Data ---\n",
+    "DATA_PATH = \"data/warehouse_stock.csv\"\n",
+    "os.makedirs(\"data\", exist_ok=True)\n",
+    "\n",
+    "st.sidebar.header(\"📂 Data Source\")\n",
+    "\n",
+    "if not os.path.exists(DATA_PATH):\n",
+    "    st.warning(\"No stock database found. Please upload one to start.\")\n",
+    "    stock_file = st.sidebar.file_uploader(\"Upload stock data (CSV)\", type=[\"csv\"])\n",
+    "    if stock_file:\n",
+    "        df = pd.read_csv(stock_file)\n",
+    "        df.to_csv(DATA_PATH, index=False)\n",
+    "        st.success(\"✅ Stock data uploaded and saved.\")\n",
+    "    else:\n",
+    "        st.stop()\n",
+    "else:\n",
+    "    df = pd.read_csv(DATA_PATH)\n",
+    "\n",
+    "# --- Data Cleaning ---\n",
+    "df.columns = [c.strip().title().replace(\" \", \"_\") for c in df.columns]\n",
+    "if \"Outstanding\" not in df.columns:\n",
+    "    st.error(\"Missing 'Outstanding' column in your data.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "df[\"Outstanding\"] = pd.to_numeric(df[\"Outstanding\"], errors=\"coerce\").fillna(0)\n",
+    "df = df.dropna(subset=[\"Product\", \"Location\"]).reset_index(drop=True)\n",
+    "\n",
+    "# --- Sidebar Filters ---\n",
+    "st.sidebar.header(\"🔍 Filters\")\n",
+    "\n",
+    "aisles = sorted(df[\"Aisle\"].dropna().unique()) if \"Aisle\" in df.columns else []\n",
+    "selected_aisle = st.sidebar.selectbox(\"Select Aisle\", [\"All\"] + aisles)\n",
+    "\n",
+    "status_list = [\"Received\", \"In Transit\", \"Out of Stock\"]\n",
+    "if \"Status\" not in df.columns:\n",
+    "    df[\"Status\"] = \"Received\"\n",
+    "\n",
+    "selected_status = st.sidebar.multiselect(\"Filter by Stock Status\", status_list, default=status_list)\n",
+    "search_query = st.sidebar.text_input(\"Search Product / SKU / Location\")\n",
+    "\n",
+    "# --- Filter Logic ---\n",
+    "filtered_df = df.copy()\n",
+    "if selected_aisle != \"All\":\n",
+    "    filtered_df = filtered_df[filtered_df[\"Aisle\"] == selected_aisle]\n",
+    "if selected_status:\n",
+    "    filtered_df = filtered_df[filtered_df[\"Status\"].isin(selected_status)]\n",
+    "\n",
+    "# --- Smart Fuzzy Search ---\n",
+    "def fuzzy_match(row_text, query):\n",
+    "    \"\"\"Return True if query roughly matches text (case-insensitive, typo-tolerant, any word order).\"\"\"\n",
+    "    if not isinstance(row_text, str) or not isinstance(query, str):\n",
+    "        return False\n",
+    "    row_text = row_text.lower()\n",
+    "    query = query.lower()\n",
+    "\n",
+    "    # Word-based loose matching\n",
+    "    query_words = query.split()\n",
+    "    if all(word in row_text for word in query_words):\n",
+    "        return True\n",
+    "\n",
+    "    # Fuzzy ratio for typos or partial matches\n",
+    "    return fuzz.token_set_ratio(row_text, query) >= 70\n",
+    "\n",
+    "\n",
+    "if search_query.strip():\n",
+    "    searchable_cols = [\"Product\", \"Location\"]\n",
+    "    if \"Sku\" in filtered_df.columns:\n",
+    "        searchable_cols.append(\"Sku\")\n",
+    "\n",
+    "    mask = filtered_df.apply(\n",
+    "        lambda row: any(fuzzy_match(str(row[col]), search_query) for col in searchable_cols),\n",
+    "        axis=1\n",
+    "    )\n",
+    "\n",
+    "    filtered_df = filtered_df[mask]\n",
+    "\n",
+    "if filtered_df.empty:\n",
+    "    st.info(\"No matching records found for the selected filters.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "# --- Low Stock Alerts ---\n",
+    "st.sidebar.header(\"⚠️ Stock Alert Settings\")\n",
+    "low_stock_threshold = st.sidebar.number_input(\"Low Stock Threshold\", min_value=1, value=100, step=10)\n",
+    "filtered_df[\"Alert\"] = filtered_df[\"Outstanding\"].apply(\n",
+    "    lambda x: \"🔴 LOW\" if x < low_stock_threshold else\n",
+    "              \"🟡 Medium\" if x < low_stock_threshold * 1.5 else\n",
+    "              \"🟢 OK\"\n",
+    ")\n",
+    "\n",
+    "# --- Metrics ---\n",
+    "st.markdown(\"### 📈 Stock Summary Overview\")\n",
+    "\n",
+    "col1, col2, col3, col4 = st.columns(4)\n",
+    "col1.metric(\"Total Stock\", int(filtered_df[\"Outstanding\"].sum()))\n",
+    "col2.metric(\"Unique Products\", filtered_df[\"Product\"].nunique())\n",
+    "col3.metric(\"Active Locations\", filtered_df[\"Location\"].nunique())\n",
+    "col4.metric(\"Low Stock Items\", (filtered_df['Alert'] == \"🔴 LOW\").sum())\n",
+    "\n",
+    "# --- Visualization 1: Stock per Location ---\n",
+    "st.markdown(\"### 🏭 Stock by Location\")\n",
+    "\n",
+    "fig = px.bar(\n",
+    "    filtered_df,\n",
+    "    x=\"Location\",\n",
+    "    y=\"Outstanding\",\n",
+    "    color=\"Alert\",\n",
+    "    text=\"Outstanding\",\n",
+    "    hover_data={\n",
+    "        \"Product\": True,\n",
+    "        \"Status\": True,\n",
+    "        \"Alert\": True,\n",
+    "        \"Outstanding\": True\n",
+    "    },\n",
+    "    color_discrete_map={\n",
+    "        \"🔴 LOW\": \"red\",\n",
+    "        \"🟡 Medium\": \"orange\",\n",
+    "        \"🟢 OK\": \"green\"\n",
+    "    },\n",
+    "    title=f\"Stock Distribution {'(All Aisles)' if selected_aisle == 'All' else f'in Aisle {selected_aisle}'}\"\n",
+    ")\n",
+    "\n",
+    "fig.update_traces(\n",
+    "    textposition=\"outside\",\n",
+    "    hovertemplate=(\n",
+    "        \"<b>📍 Location:</b> %{x}<br>\"\n",
+    "        \"<b>🧾 Product:</b> %{customdata[0]}<br>\"\n",
+    "        \"<b>🚚 Status:</b> %{customdata[1]}<br>\"\n",
+    "        \"<b>📦 Stock:</b> %{y} units<br>\"\n",
+    "        \"<b>⚠️ Alert:</b> %{customdata[2]}<extra></extra>\"\n",
+    "    )\n",
+    ")\n",
+    "\n",
+    "# --- 🖤 Hover Fix for Readability ---\n",
+    "fig.update_layout(\n",
+    "    hoverlabel=dict(\n",
+    "        bgcolor=\"rgba(50, 50, 50, 0.9)\",   # dark hover background\n",
+    "        font_color=\"white\",\n",
+    "        font_size=13,\n",
+    "        font_family=\"Arial\"\n",
+    "    ),\n",
+    "    height=600,\n",
+    "    xaxis_title=\"Location\",\n",
+    "    yaxis_title=\"Outstanding Units\",\n",
+    "    template=\"plotly_white\",\n",
+    "    title_x=0.3\n",
+    ")\n",
+    "\n",
+    "st.plotly_chart(fig, use_container_width=True)\n",
+    "\n",
+    "# --- Visualization 2: Top 10 Products ---\n",
+    "# --- Visualization 2: Top 10 Products ---\n",
+    "st.markdown(\"##overstock product by  Quantity\")\n",
+    "\n",
+    "top10 = filtered_df.nlargest(10, \"Outstanding\")\n",
+    "\n",
+    "fig_top = px.bar(\n",
+    "    top10,\n",
+    "    x=\"Product\",\n",
+    "    y=\"Outstanding\",\n",
+    "    color=\"Outstanding\",\n",
+    "    text=\"Outstanding\",\n",
+    "    color_continuous_scale=\"Blues\",\n",
+    "    title=\"Top 10 Products by Quantity\"\n",
+    ")\n",
+    "\n",
+    "fig_top.update_traces(textposition=\"outside\")\n",
+    "\n",
+    "# ✅ Keep product names straight and readable\n",
+    "fig_top.update_layout(\n",
+    "    xaxis=dict(\n",
+    "        tickangle=0,  # 0 = straight labels\n",
+    "        tickfont=dict(size=12),\n",
+    "        automargin=True\n",
+    "    ),\n",
+    "    yaxis_title=\"Outstanding Units\",\n",
+    "    xaxis_title=\"Product\",\n",
+    "    hoverlabel=dict(\n",
+    "        bgcolor=\"rgba(50, 50, 50, 0.9)\",\n",
+    "        font_color=\"white\",\n",
+    "        font_size=13,\n",
+    "        font_family=\"Arial\"\n",
+    "    ),\n",
+    "    height=500,\n",
+    "    template=\"plotly_white\"\n",
+    ")\n",
+    "\n",
+    "st.plotly_chart(fig_top, use_container_width=True)\n",
+    "\n",
+    "# --- Visualization 3: Stock Trend (if Date column exists) ---\n",
+    "if \"Date\" in filtered_df.columns:\n",
+    "    st.markdown(\"### ⏳ Stock Trend Over Time\")\n",
+    "    trend_df = filtered_df.groupby(\"Date\")[\"Outstanding\"].sum().reset_index()\n",
+    "    fig_trend = px.line(trend_df, x=\"Date\", y=\"Outstanding\", title=\"Stock Trend Over Time\", markers=True)\n",
+    "    st.plotly_chart(fig_trend, use_container_width=True)\n",
+    "\n",
+    "# --- Detailed Data Table ---\n",
+    "with st.expander(\"📋 View Detailed Stock Data\"):\n",
+    "    st.dataframe(filtered_df, use_container_width=True)\n",
+    "\n",
+    "# --- Export Button ---\n",
+    "csv_export = filtered_df.to_csv(index=False).encode(\"utf-8\")\n",
+    "st.download_button(\"💾 Download Filtered Data (CSV)\", csv_export, \"filtered_stock.csv\", \"text/csv\")\n",
+    "\n",
+    "st.markdown(\"---\")\n",
+    "st.caption(\"Warehouse Dashboard v2.1 | Smart fuzzy search, alerts, and live analytics.\")"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "barcode_demo",
+   "language": "python",
+   "name": "barcode_demo"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

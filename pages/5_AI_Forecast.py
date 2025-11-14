@@ -1,144 +1,242 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[2]:
-
-
-# ai_sales_forecast.py
-import streamlit as st
-import pandas as pd
-import plotly.express as px
-import os
-from prophet import Prophet
-
-st.set_page_config(page_title="🤖 AI Sales Forecast", layout="wide")
-st.title("📈 AI Forecast – Vape Sales Movement Trends")
-st.caption("Forecasts next 7 days of sales and identifies fast, stable, or slow-moving products.")
-
-# ---------- Load Sales Data ----------
-# Use your actual data directory
-DATA_DIR = "/Users/anandhu/Downloads/Barcode Printer/data/sales_reports"
-
-if not os.path.exists(DATA_DIR):
-    st.error(f"❌ The folder '{DATA_DIR}' does not exist.")
-    st.stop()
-
-csv_files = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR) if f.endswith(".csv")]
-
-if not csv_files:
-    st.error("⚠️ No sales data found. Please make sure there are CSV files in the folder.")
-    st.stop()
-
-# Combine all CSVs into one dataframe
-df_list = []
-for f in csv_files:
-    try:
-        # Extract date from filename like 'sales_2025-10-25.csv'
-        date_str = os.path.basename(f)
-        date_match = None
-        for pattern in [r"sales_(\d{4}-\d{2}-\d{2})", r"(\d{4}-\d{2}-\d{2})"]:
-            import re
-            m = re.search(pattern, date_str)
-            if m:
-                date_match = m.group(1)
-                break
-
-        if not date_match:
-            st.warning(f"⚠️ Skipping file without date pattern: {f}")
-            continue
-
-        df = pd.read_csv(f)
-        df["Date"] = pd.to_datetime(date_match)
-        df_list.append(df)
-
-    except Exception as e:
-        st.warning(f"⚠️ Error reading {f}: {e}")
-
-if not df_list:
-    st.error("⚠️ No valid sales files loaded.")
-    st.stop()
-
-data = pd.concat(df_list, ignore_index=True)
-
-# ---------- Clean Data ----------
-if "Product" not in data.columns or "Sales_Units" not in data.columns:
-    st.error("❌ Missing required columns: 'Product' and 'Sales_Units'.")
-    st.stop()
-
-data["Sales_Units"] = pd.to_numeric(data["Sales_Units"], errors="coerce").fillna(0)
-data = data.dropna(subset=["Product"])
-daily_sales = data.groupby(["Date", "Product"], as_index=False)["Sales_Units"].sum()
-
-# ---------- Show Recent Data ----------
-st.markdown("### 🧾 Recent Sales Data (Last 10 Days)")
-st.dataframe(daily_sales.sort_values("Date").tail(10))
-
-# ---------- Product Selection ----------
-products = sorted(daily_sales["Product"].unique())
-selected_product = st.selectbox("Select a product to forecast", products)
-
-prod_data = daily_sales[daily_sales["Product"] == selected_product][["Date", "Sales_Units"]]
-prod_data = prod_data.rename(columns={"Date": "ds", "Sales_Units": "y"})
-
-if len(prod_data) < 5:
-    st.warning("⚠️ Not enough data points to forecast reliably.")
-    st.stop()
-
-# ---------- Prophet Forecast ----------
-m = Prophet(weekly_seasonality=True, daily_seasonality=False, seasonality_mode="additive")
-m.fit(prod_data)
-future = m.make_future_dataframe(periods=7)
-forecast = m.predict(future)
-
-# ---------- Rolling Average Adjustment ----------
-forecast_plot = forecast[["ds", "yhat"]].merge(prod_data, on="ds", how="left")
-forecast_plot["Adj_Forecast"] = (
-    0.7 * forecast_plot["yhat"]
-    + 0.3 * forecast_plot["y"].rolling(window=3, min_periods=1).mean().fillna(method="bfill")
-)
-
-# ---------- Visualization ----------
-fig = px.line(
-    forecast_plot,
-    x="ds",
-    y=["y", "Adj_Forecast"],
-    labels={"ds": "Date", "value": "Sales Units"},
-    title=f"📊 Forecasted Sales Trend – {selected_product}",
-)
-fig.update_layout(template="plotly_white", legend_title="Series")
-st.plotly_chart(fig, use_container_width=True)
-
-# ---------- Trend Classification ----------
-last_actual = forecast_plot["y"].dropna().iloc[-1]
-next_forecast = forecast_plot["Adj_Forecast"].iloc[-1]
-
-trend = (
-    "⚡ Fast Moving" if next_forecast > last_actual * 1.1
-    else "🐢 Slow Moving" if next_forecast < last_actual * 0.9
-    else "➖ Stable"
-)
-st.metric(label="Forecasted Product Trend", value=trend)
-
-# ---------- Multi-Product Trend Summary ----------
-st.markdown("### 📈 Fastest & Slowest Moving Products")
-
-summary = (
-    daily_sales.groupby("Product", as_index=False)["Sales_Units"].mean()
-    .sort_values("Sales_Units", ascending=False)
-)
-summary["Movement"] = [
-    "⚡ Fast" if i < len(summary) * 0.3 else "🐢 Slow" if i > len(summary) * 0.7 else "➖ Stable"
-    for i in range(len(summary))
-]
-
-st.dataframe(summary)
-
-st.markdown("---")
-st.caption("AI Forecast v1.0 | Prophet + Rolling Average | Based on daily sales data")
-
-
-# In[ ]:
-
-
-
-
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "786803a6-af4d-4adf-b6d6-7d8c85a25dc2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/opt/anaconda3/envs/barcode/lib/python3.12/site-packages/tqdm/auto.py:21: TqdmWarning: IProgress not found. Please update jupyter and ipywidgets. See https://ipywidgets.readthedocs.io/en/stable/user_install.html\n",
+      "  from .autonotebook import tqdm as notebook_tqdm\n",
+      "2025-10-27 19:11:42.028 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.028 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.108 \n",
+      "  \u001b[33m\u001b[1mWarning:\u001b[0m to view this Streamlit app on a browser, run it with the following\n",
+      "  command:\n",
+      "\n",
+      "    streamlit run /opt/anaconda3/envs/barcode/lib/python3.12/site-packages/ipykernel_launcher.py [ARGUMENTS]\n",
+      "2025-10-27 19:11:42.109 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.109 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.109 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.109 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.109 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.145 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.145 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.146 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.163 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.163 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.163 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.164 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.164 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.164 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.164 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.165 Session state does not function when running a script without `streamlit run`\n",
+      "2025-10-27 19:11:42.165 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.165 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.165 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "19:11:42 - cmdstanpy - INFO - Chain [1] start processing\n",
+      "19:11:42 - cmdstanpy - INFO - Chain [1] done processing\n",
+      "/var/folders/q9/81tm31y117qd577k02hq_px00000gn/T/ipykernel_40398/2451650791.py:91: FutureWarning: Series.fillna with 'method' is deprecated and will raise in a future version. Use obj.ffill() or obj.bfill() instead.\n",
+      "  + 0.3 * forecast_plot[\"y\"].rolling(window=3, min_periods=1).mean().fillna(method=\"bfill\")\n",
+      "2025-10-27 19:11:42.414 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.414 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.414 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.416 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.416 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.416 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.419 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.419 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n",
+      "2025-10-27 19:11:42.419 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "DeltaGenerator()"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "# ai_sales_forecast.py\n",
+    "import streamlit as st\n",
+    "import pandas as pd\n",
+    "import plotly.express as px\n",
+    "import os\n",
+    "from prophet import Prophet\n",
+    "\n",
+    "st.set_page_config(page_title=\"🤖 AI Sales Forecast\", layout=\"wide\")\n",
+    "st.title(\"📈 AI Forecast – Vape Sales Movement Trends\")\n",
+    "st.caption(\"Forecasts next 7 days of sales and identifies fast, stable, or slow-moving products.\")\n",
+    "\n",
+    "# ---------- Load Sales Data ----------\n",
+    "# Use your actual data directory\n",
+    "DATA_DIR = \"/Users/anandhu/Downloads/Barcode Printer/data/sales_reports\"\n",
+    "\n",
+    "if not os.path.exists(DATA_DIR):\n",
+    "    st.error(f\"❌ The folder '{DATA_DIR}' does not exist.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "csv_files = [os.path.join(DATA_DIR, f) for f in os.listdir(DATA_DIR) if f.endswith(\".csv\")]\n",
+    "\n",
+    "if not csv_files:\n",
+    "    st.error(\"⚠️ No sales data found. Please make sure there are CSV files in the folder.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "# Combine all CSVs into one dataframe\n",
+    "df_list = []\n",
+    "for f in csv_files:\n",
+    "    try:\n",
+    "        # Extract date from filename like 'sales_2025-10-25.csv'\n",
+    "        date_str = os.path.basename(f)\n",
+    "        date_match = None\n",
+    "        for pattern in [r\"sales_(\\d{4}-\\d{2}-\\d{2})\", r\"(\\d{4}-\\d{2}-\\d{2})\"]:\n",
+    "            import re\n",
+    "            m = re.search(pattern, date_str)\n",
+    "            if m:\n",
+    "                date_match = m.group(1)\n",
+    "                break\n",
+    "\n",
+    "        if not date_match:\n",
+    "            st.warning(f\"⚠️ Skipping file without date pattern: {f}\")\n",
+    "            continue\n",
+    "\n",
+    "        df = pd.read_csv(f)\n",
+    "        df[\"Date\"] = pd.to_datetime(date_match)\n",
+    "        df_list.append(df)\n",
+    "\n",
+    "    except Exception as e:\n",
+    "        st.warning(f\"⚠️ Error reading {f}: {e}\")\n",
+    "\n",
+    "if not df_list:\n",
+    "    st.error(\"⚠️ No valid sales files loaded.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "data = pd.concat(df_list, ignore_index=True)\n",
+    "\n",
+    "# ---------- Clean Data ----------\n",
+    "if \"Product\" not in data.columns or \"Sales_Units\" not in data.columns:\n",
+    "    st.error(\"❌ Missing required columns: 'Product' and 'Sales_Units'.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "data[\"Sales_Units\"] = pd.to_numeric(data[\"Sales_Units\"], errors=\"coerce\").fillna(0)\n",
+    "data = data.dropna(subset=[\"Product\"])\n",
+    "daily_sales = data.groupby([\"Date\", \"Product\"], as_index=False)[\"Sales_Units\"].sum()\n",
+    "\n",
+    "# ---------- Show Recent Data ----------\n",
+    "st.markdown(\"### 🧾 Recent Sales Data (Last 10 Days)\")\n",
+    "st.dataframe(daily_sales.sort_values(\"Date\").tail(10))\n",
+    "\n",
+    "# ---------- Product Selection ----------\n",
+    "products = sorted(daily_sales[\"Product\"].unique())\n",
+    "selected_product = st.selectbox(\"Select a product to forecast\", products)\n",
+    "\n",
+    "prod_data = daily_sales[daily_sales[\"Product\"] == selected_product][[\"Date\", \"Sales_Units\"]]\n",
+    "prod_data = prod_data.rename(columns={\"Date\": \"ds\", \"Sales_Units\": \"y\"})\n",
+    "\n",
+    "if len(prod_data) < 5:\n",
+    "    st.warning(\"⚠️ Not enough data points to forecast reliably.\")\n",
+    "    st.stop()\n",
+    "\n",
+    "# ---------- Prophet Forecast ----------\n",
+    "m = Prophet(weekly_seasonality=True, daily_seasonality=False, seasonality_mode=\"additive\")\n",
+    "m.fit(prod_data)\n",
+    "future = m.make_future_dataframe(periods=7)\n",
+    "forecast = m.predict(future)\n",
+    "\n",
+    "# ---------- Rolling Average Adjustment ----------\n",
+    "forecast_plot = forecast[[\"ds\", \"yhat\"]].merge(prod_data, on=\"ds\", how=\"left\")\n",
+    "forecast_plot[\"Adj_Forecast\"] = (\n",
+    "    0.7 * forecast_plot[\"yhat\"]\n",
+    "    + 0.3 * forecast_plot[\"y\"].rolling(window=3, min_periods=1).mean().fillna(method=\"bfill\")\n",
+    ")\n",
+    "\n",
+    "# ---------- Visualization ----------\n",
+    "fig = px.line(\n",
+    "    forecast_plot,\n",
+    "    x=\"ds\",\n",
+    "    y=[\"y\", \"Adj_Forecast\"],\n",
+    "    labels={\"ds\": \"Date\", \"value\": \"Sales Units\"},\n",
+    "    title=f\"📊 Forecasted Sales Trend – {selected_product}\",\n",
+    ")\n",
+    "fig.update_layout(template=\"plotly_white\", legend_title=\"Series\")\n",
+    "st.plotly_chart(fig, use_container_width=True)\n",
+    "\n",
+    "# ---------- Trend Classification ----------\n",
+    "last_actual = forecast_plot[\"y\"].dropna().iloc[-1]\n",
+    "next_forecast = forecast_plot[\"Adj_Forecast\"].iloc[-1]\n",
+    "\n",
+    "trend = (\n",
+    "    \"⚡ Fast Moving\" if next_forecast > last_actual * 1.1\n",
+    "    else \"🐢 Slow Moving\" if next_forecast < last_actual * 0.9\n",
+    "    else \"➖ Stable\"\n",
+    ")\n",
+    "st.metric(label=\"Forecasted Product Trend\", value=trend)\n",
+    "\n",
+    "# ---------- Multi-Product Trend Summary ----------\n",
+    "st.markdown(\"### 📈 Fastest & Slowest Moving Products\")\n",
+    "\n",
+    "summary = (\n",
+    "    daily_sales.groupby(\"Product\", as_index=False)[\"Sales_Units\"].mean()\n",
+    "    .sort_values(\"Sales_Units\", ascending=False)\n",
+    ")\n",
+    "summary[\"Movement\"] = [\n",
+    "    \"⚡ Fast\" if i < len(summary) * 0.3 else \"🐢 Slow\" if i > len(summary) * 0.7 else \"➖ Stable\"\n",
+    "    for i in range(len(summary))\n",
+    "]\n",
+    "\n",
+    "st.dataframe(summary)\n",
+    "\n",
+    "st.markdown(\"---\")\n",
+    "st.caption(\"AI Forecast v1.0 | Prophet + Rolling Average | Based on daily sales data\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "a0b0b027-c27b-49f6-b3a8-07fb9fcbcb31",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "barcode_demo",
+   "language": "python",
+   "name": "barcode_demo"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.12"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
