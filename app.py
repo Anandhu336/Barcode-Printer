@@ -1,58 +1,91 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[ ]:
+# In[2]:
 
+
+# app.py - Main entry for Warehouse Management System
+# Replace your existing app.py with this file.
 
 import streamlit as st
-import subprocess
 import base64
 import os
+from pathlib import Path
+import importlib.util
+import traceback
 
-# --- Page Config ---
+# ---------------- Page config ----------------
 st.set_page_config(page_title="Warehouse Management System", layout="wide", initial_sidebar_state="collapsed")
 
-# --- Background Image ---
-IMAGE_PATH = "/Users/anandhu/Downloads/Barcode Printer/Background.jpg"
+# ---------------- Background image (repo-relative) ----------------
+# Put Background.jpg in repo root or assets/ or static/ and commit it.
+REL_IMAGE_PATHS = [
+    "Background.jpg",
+    "assets/Background.jpg",
+    "static/Background.jpg",
+]
 
 def get_base64_image(image_path):
-    with open(image_path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
-
-image_base64 = get_base64_image(IMAGE_PATH) if os.path.exists(IMAGE_PATH) else ""
-
-def launch_module(file, message):
     try:
-        # Get absolute path of the module
-        full_path = os.path.abspath(os.path.join(os.path.dirname(__file__), file))
+        with open(image_path, "rb") as img_file:
+            return base64.b64encode(img_file.read()).decode()
+    except Exception:
+        return ""
 
-        # Check if file exists
-        if not os.path.exists(full_path):
-            st.error(f"❌ Module not found: {full_path}")
-            return
+image_base64 = ""
+for p in REL_IMAGE_PATHS:
+    if os.path.exists(p):
+        image_base64 = get_base64_image(p)
+        break
 
-        # Determine the correct Streamlit command
-        # This will open a new Streamlit process in the background and keep it alive
-        subprocess.Popen(
-            ["streamlit", "run", full_path],
-            cwd=os.path.dirname(full_path),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
+# ---------------- Robust module launcher (works on Streamlit Cloud) ----------------
+def launch_module(filename: str, message: str = ""):
+    """
+    Import/execute a local module by filename without spawning a new Streamlit process.
+    Looks for the file in repo root, pages/, and apps/ directories.
+    Shows friendly Streamlit errors and full traceback in an expander.
+    """
+    base = Path(__file__).resolve().parent
 
-        # Confirm to the user
-        st.toast(f"{message} (Launching...)", icon="🚀")
-        st.success(f"✅ {os.path.basename(file)} launched successfully! Check your browser tabs.")
+    # candidate locations to look for the file (repo root, pages, apps)
+    candidates = [
+        base / filename,
+        base / "pages" / filename,
+        base / "apps" / filename,
+    ]
 
+    found = None
+    for p in candidates:
+        if p.exists():
+            found = p
+            break
+
+    if found is None:
+        st.error("❌ Module not found. Tried these locations:")
+        for p in candidates:
+            st.write(f"- {p}")
+        return
+
+    try:
+        # Inform the user
+        if message:
+            st.info(message)
+
+        # Import and execute the module by file path
+        spec = importlib.util.spec_from_file_location(found.stem, str(found))
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        st.success(f"✅ {found.name} launched successfully in this session.")
     except Exception as e:
-        st.error(f"⚠️ Failed to launch {file}: {e}")
+        st.error(f"⚠️ Failed to import {found.name}: {e}")
+        with st.expander("Full traceback (for debugging)"):
+            st.text(traceback.format_exc())
 
-# ---------- CSS & UI Design ----------
-st.markdown(f"""
+# ---------------- CSS & UI Design ----------------
+bg_style = f"""
     <style>
     [data-testid="stAppViewContainer"] {{
-        background-image: linear-gradient(135deg, rgba(8,18,30,0.78), rgba(25,34,45,0.78)),
-                          url("data:image/jpeg;base64,{image_base64}");
+        background-image: linear-gradient(135deg, rgba(8,18,30,0.78), rgba(25,34,45,0.78)){ (', url("data:image/jpeg;base64,' + image_base64 + '")') if image_base64 else '' };
         background-size: cover;
         background-position: center;
         background-attachment: fixed;
@@ -138,9 +171,10 @@ st.markdown(f"""
 
     footer, header {{ visibility: hidden; }}
     </style>
-""", unsafe_allow_html=True)
+"""
+st.markdown(bg_style, unsafe_allow_html=True)
 
-# ---------- Navbar ----------
+# ---------------- Navbar ----------------
 st.markdown("""
     <div class="content-wrap">
         <div class="navbar">
@@ -158,7 +192,7 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# ---------- Module Info ----------
+# ---------------- Module Info ----------------
 modules = [
     ("🏷️", "Label Printing", "Generate and print product barcodes easily", "label_app.py", "Launching Label Printing Module..."),
     ("📊", "Live Stock Dashboard", "Monitor real-time warehouse inventory", "stock_dashboard.py", "Opening Live Stock Dashboard..."),
@@ -167,7 +201,7 @@ modules = [
     ("🤖", "AI Sales Forecast", "Predict demand and optimise inventory", "aiforecast.py", "Launching AI Forecast System..."),
 ]
 
-# ---------- Helper to create tiles ----------
+# ---------------- Helper to create tiles ----------------
 def tile_html(emoji, title, desc, key):
     return f"""
     <div class="tile" id="{key}">
@@ -177,7 +211,7 @@ def tile_html(emoji, title, desc, key):
     </div>
     """
 
-# ---------- Render Layout ----------
+# ---------------- Render Layout ----------------
 st.markdown('<div class="content-wrap">', unsafe_allow_html=True)
 
 # Top row (3 tiles)
@@ -215,10 +249,16 @@ with cols2[2]:
 
 st.markdown('</div>', unsafe_allow_html=True)
 
-# ---------- Footer ----------
+# ---------------- Footer ----------------
 st.markdown("""
     <div style='text-align:center; color:#cbd5e1; font-size:14px; font-weight:600; margin-top:28px;'>
         © 2025 Warehouse Management System | Designed for Real-Time Operations 🚚
     </div>
 """, unsafe_allow_html=True)
+
+
+# In[ ]:
+
+
+
 
